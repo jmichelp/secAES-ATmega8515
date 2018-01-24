@@ -6,4 +6,4 @@
     \param the output is directly stored in the global
            variable input     
 */
-void asm_maskedAES128enc();
+void asm_maskedAES128enc(void);
