@@ -25,10 +25,12 @@ UCHAR keyState     [AESStateSize];
 
 // Global variable used to align the maskedSbox table whose
 // address must be a multiple of 256
-UCHAR zeroValue        [37];
+// 2018-01-24 removing that in favor of __align__ attribute
+// because gcc will not guarantee alignment otherwise.
+// UCHAR zeroValue        [37];
 
 // Global variable to store the re-computed table in RAM 
-UCHAR maskedSbox       [AESCARDGF256];
+UCHAR maskedSbox       [AESCARDGF256]  __attribute__((aligned (256)));
 // Global variable to store the indices of the permutation table used to shuffle the processing
 UCHAR permIndices      [AESStateSize];
 // Global variable to store the indices of the permutation table used to shuffle the processing 
