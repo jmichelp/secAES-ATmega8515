@@ -1158,7 +1158,7 @@ buildIndicesPermutation:
 ;       Let F1 = permIndices, F2=perIndices, G = permGFSixteen, m1||m0 = mask[0] and m3||m2 = mask[1]
 ;                      F1(x) = G(G(G(G(x^m0)^m1)^m2)^m3) 
 ;                      F2(x) = G(G(G(G(G(G(G(x^m0)^m1)^m2)^m3)^m1)^m2)^m3)
-; NOTE: r16, r17, r18, r19, r20, r21, r22, , r23, r26, r27, r30, r31
+; NOTE: r16, r17, r18, r19, r20, r21, r22, r23, r26, r27, r30, r31
 
 LDI  r26,lo8(mask)
 LDI  r27,hi8(mask)
@@ -1184,8 +1184,8 @@ LDI r23, 0x0f            ; r16 = x
 LDI r24, 0x10           ; lopp index
 CLR r2                  ; to deal with carry propagation
 
-; BEGIN compute permIndices(x)    = G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) for very x
-;           and permIndicesBis(x) = G(G(G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3)^m1)^m2)^m3) for very x
+; BEGIN compute permIndices(x)    = G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) for very x
+;           and permIndicesBis(x) = G(G(G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3)^m1)^m2)^m3) for very x
 permIndicesLoop:
 ; for permIndices
 MOV r22,r23
@@ -1193,41 +1193,41 @@ EOR r22,r16                             ; r22 = x + m0
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(x + m0)
-EOR r22,r17                             ; r22 = G(x + m0) ^ m1 
+LPM r22,Z                               ; r22 = G(x ^ m0)
+EOR r22,r17                             ; r22 = G(x ^ m0) ^ m1 
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(G(x + m0) ^ m1)
-EOR r22,r18                             ; r22 = G(G(x + m0) ^ m1) ^ m2
+LPM r22,Z                               ; r22 = G(G(x ^ m0) ^ m1)
+EOR r22,r18                             ; r22 = G(G(x ^ m0) ^ m1) ^ m2
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(G(G(x + m0) ^ m1) ^ m2)
-EOR r22,r19                             ; r22 = G(G(G(x + m0) ^ m1) ^ m2) ^ m3
+LPM r22,Z                               ; r22 = G(G(G(x ^ m0) ^ m1) ^ m2)
+EOR r22,r19                             ; r22 = G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3)
-ST X+,r22                               ; X <- G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) and X++
+LPM r22,Z                               ; r22 = G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3)
+ST X+,r22                               ; X <- G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) and X++
 
 ; for permIndicesBis
-EOR r22,r17                             ; r22 = G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1 
+EOR r22,r17                             ; r22 = G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1 
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1)
-EOR r22,r18                             ; r22 = G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2
+LPM r22,Z                               ; r22 = G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1)
+EOR r22,r18                             ; r22 = G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2)
-EOR r22,r19                             ; r22 = G(G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2) ^ m3
+LPM r22,Z                               ; r22 = G(G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2)
+EOR r22,r19                             ; r22 = G(G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2) ^ m3
 MOVW r30,r20                            ; Z = #G
 ADD r30,r22
 ADC r31,r2                              ; Z = #(G(r22))
-LPM r22,Z                               ; r22 = G(G(G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2) ^ m3)
-ST Y+,r22                               ; Y <- G(G(G(G(G(G(G(x + m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2) ^ m3) and Y++
+LPM r22,Z                               ; r22 = G(G(G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2) ^ m3)
+ST Y+,r22                               ; Y <- G(G(G(G(G(G(G(x ^ m0) ^ m1) ^ m2) ^ m3) ^ m1) ^ m2) ^ m3) and Y++
 
 DEC r23                                 ; decrement loop index
 DEC r24
@@ -1620,10 +1620,10 @@ RET
 ;****************************************************************************************************
 asm_maskedAES128enc:
 ; main function asm_maskedAES128enc
-; INPUT: 3 arguments stored in global variables "input", "key" and "masks" respectively
+; INPUT: 3 arguments stored in global variables "input", "secret" and "masks" respectively
 ; OUTPUT: output is returned in "input" (which is therefore erased)
 ; NOTE: all arrays are 16 bytes long except masks which contains 18 bytes
-; NOTE: the key is not overwritten but not the input
+; NOTE: the secret is not overwritten but not the input
 ; COMPLEXITY: 82 437 cycles (current version)
 ; 
 
